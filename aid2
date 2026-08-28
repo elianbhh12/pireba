@@ -1,0 +1,85 @@
+{
+    "s3_path": "s3://nu6490001-udz-qa-repository/crudos/ns_productos/FORMULARIO_DIGITAL_SEGUROSENDOSOS",
+    "workflow_definition": [
+        {
+            "LEVEL_ID": "1",
+            "THREADS": [
+                {
+                    "STEPS": [
+                        {
+                            "FUNCTION_NAME": "convert_image",
+                            "JOB_ID": "J01",
+                            "JOB_NAME": "dataprocessing",
+                            "READ_INPUT_FROM": "ENV",
+                            "STEP_VARIABLES": {
+                                "out_zone": "procesos"
+                            },
+                            "TYPE": "topic"
+                        },
+                        {
+                            "FUNCTION_NAME": "text_extraction",
+                            "JOB_ID": "J02",
+                            "JOB_NAME": "textextractor",
+                            "READ_INPUT_FROM": "J01",
+                            "STEP_VARIABLES": {
+                                "features": [
+                                ],
+                                "linearize": true,
+                                "provider": "azure"
+                            },
+                            "TYPE": "topic"
+                        },
+                        {
+                            "FUNCTION_NAME": "text_analyzer",
+                            "JOB_ID": "J03",
+                            "JOB_NAME": "textanalyzer",
+                            "READ_INPUT_FROM": "J02",
+                            "STEP_VARIABLES": {
+                                "use_case": "ta_seguros_deudores_endosos"
+                            },
+                            "TYPE": "topic"
+                        },
+                        {
+                            "FUNCTION_NAME": "postprocess_query",
+                            "JOB_ID": "J04",
+                            "JOB_NAME": "postprocessing",
+                            "MS_TYPE": "ms_pure",
+                            "READ_INPUT_FROM": "J03",
+                            "STEP_VARIABLES": {
+                                "postp_config": {
+                                    "operations": {
+                                        "P1": {}
+                                    },
+                                    "response_in_s3": true
+                                }
+                            },
+                            "TYPE": "topic"
+                        },
+                        {
+                            "JOB_ID": "J05",
+                            "JOB_NAME": "store_results",
+                            "READ_INPUT_FROM": "J04",
+                            "TYPE": "w  rite_results"
+                        }
+                    ],
+                    "THREAD_ID": "1"
+                }
+            ]
+        },
+        {
+            "LAMBDA_NAMES": "[\"Datawriter\"]",
+            "LAST_STEP": "False",
+            "LEVEL_ID": "CALLBACK_FAIL",
+            "MS_ENDPOINT": "http://datawriter-v1-service:8080/api/v1/usecase/process"
+        }
+    ],
+    "workflow_name": "nu0087001-aid-r3-qa-seguros_deudores_endosos",
+    "workflow_variables": {
+        "canalDocumento": "CARPETA COMPARTIDA",
+        "entidad": "Bancolombia",
+        "proceso": "Seguros deudores endosos",
+        "tecnologia": "AID",
+        "tipoDocumento": "Seguros deudores endosos",
+        "validate": false
+    }
+}
