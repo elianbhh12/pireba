@@ -1,0 +1,1114 @@
+{
+    "s3_path": "s3://nu6490001-udz-pdn-repository/crudos/ns_apoyo_corporativo/EVOLUCIONDIGITAL_SEGURODEACTIVO",
+    "workflow_definition": [
+        {
+            "LEVEL_ID": "1",
+            "THREADS": [
+                {
+                    "STEPS": [
+                        {
+                            "READ_INPUT_FROM": "ENV",
+                            "JOB_ID": "J01",
+                            "JOB_NAME": "dataprocessing",
+                            "FUNCTION_NAME": "convert_image",
+                            "TYPE": "topic",
+                            "STEP_VARIABLES": {
+                                "out_zone": "procesos"
+                            }
+                        },
+                        {
+                            "READ_INPUT_FROM": "J01",
+                            "JOB_ID": "J02",
+                            "JOB_NAME": "textextractor",
+                            "FUNCTION_NAME": "text_extraction",
+                            "TYPE": "topic",
+                            "STEP_VARIABLES": {
+                                "provider": "aws",
+                                "linearize": true,
+                                "features": [
+                                    "tables",
+                                    "signatures",
+                                    "layout"
+                                ]
+                            }
+                        },
+                        {
+                            "READ_INPUT_FROM": "J02",
+                            "JOB_ID": "J03",
+                            "JOB_NAME": "textanalyzer",
+                            "FUNCTION_NAME": "text_analyzer",
+                            "TYPE": "topic",
+                            "STEP_VARIABLES": {
+                                "use_case": "ta_seguro_de_activo"
+                            }
+                        },
+                        {
+                            "READ_INPUT_FROM": "J03",
+                            "JOB_ID": "J04",
+                            "JOB_NAME": "postprocessing",
+                            "FUNCTION_NAME": "postprocess_query",
+                            "TYPE": "topic",
+                            "STEP_VARIABLES": {
+                                "postp_config": {
+                                    "operations": {
+                                        "P1": {
+                                            "tipo_seguro_value": [
+                                                {
+                                                    "op": "trim_whitespace"
+                                                },
+                                                {
+                                                    "op": "strip_whitespace"
+                                                },
+                                                {
+                                                    "op": "uppercase"
+                                                },
+                                                {
+                                                    "op": "remove_accents"
+                                                },
+                                                {
+                                                    "op": "remove_line_breaks"
+                                                },
+                                                {
+                                                    "op": "delete_dots_commas"
+                                                },
+                                                {
+                                                    "op": "delete_special_characters"
+                                                },
+                                                {
+                                                    "op": "normalize_whitespace"
+                                                },
+                                                {
+                                                    "op": "trim_whitespace"
+                                                }
+                                            ],
+                                            "fecha_cotizacion_value": [
+                                                {
+                                                    "op": "trim_whitespace"
+                                                },
+                                                {
+                                                    "op": "strip_whitespace"
+                                                },
+                                                {
+                                                    "op": "uppercase"
+                                                },
+                                                {
+                                                    "op": "remove_accents"
+                                                },
+                                                {
+                                                    "op": "remove_line_breaks"
+                                                },
+                                                {
+                                                    "op": "regex_replace",
+                                                    "args": {
+                                                        "pattern": "\\s*([/-])\\s*",
+                                                        "replacement": "\\1"
+                                                    }
+                                                },
+                                                {
+                                                    "op": "normalize_date",
+                                                    "args": {
+                                                        "input_formats": [
+                                                            "%m/%d/%Y",
+                                                            "%m-%d-%Y",
+                                                            "%m/%d/%y",
+                                                            "%m-%d-%y",
+                                                            "%Y/%m/%d",
+                                                            "%Y-%m-%d"
+                                                        ],
+                                                        "output_format": "%Y-%m-%d"
+                                                    }
+                                                },
+                                                {
+                                                    "op": "trim_whitespace"
+                                                }
+                                            ],
+                                            "nombres_apellidos_value": [
+                                                {
+                                                    "op": "trim_whitespace"
+                                                },
+                                                {
+                                                    "op": "strip_whitespace"
+                                                },
+                                                {
+                                                    "op": "uppercase"
+                                                },
+                                                {
+                                                    "op": "remove_accents"
+                                                },
+                                                {
+                                                    "op": "remove_line_breaks"
+                                                },
+                                                {
+                                                    "op": "normalize_whitespace"
+                                                },
+                                                {
+                                                    "op": "trim_whitespace"
+                                                }
+                                            ],
+                                            "tipo_documento_identificacion_value": [
+                                                {
+                                                    "op": "trim_whitespace"
+                                                },
+                                                {
+                                                    "op": "strip_whitespace"
+                                                },
+                                                {
+                                                    "op": "uppercase"
+                                                },
+                                                {
+                                                    "op": "remove_accents"
+                                                },
+                                                {
+                                                    "op": "remove_line_breaks"
+                                                },
+                                                {
+                                                    "op": "normalize_whitespace"
+                                                },
+                                                {
+                                                    "op": "delete_dots_commas"
+                                                },
+                                                {
+                                                    "op": "replace_words",
+                                                    "args": {
+                                                        "replacements": {
+                                                            "cedula": "CC",
+                                                            "cedula de ciudadania": "CC",
+                                                            "cedula ciudadania": "CC",
+                                                            "cedula de extranjeria": "CE",
+                                                            "cedula extranjeria": "CE",
+                                                            "tarjeta de identidad": "TI",
+                                                            "tarjeta identidad": "TI",
+                                                            "pasaporte": "PP",
+                                                            "passport": "PP",
+                                                            "nit": "NIT",
+                                                            "dni": "DNI",
+                                                            "cc": "CC",
+                                                            "ce": "CE",
+                                                            "ti": "TI",
+                                                            "pp": "PP"
+                                                        }
+                                                    }
+                                                },
+                                                {
+                                                    "op": "trim_whitespace"
+                                                }
+                                            ],
+                                            "numero_documento_identificacion_value": [
+                                                {
+                                                    "op": "trim_whitespace"
+                                                },
+                                                {
+                                                    "op": "strip_whitespace"
+                                                },
+                                                {
+                                                    "op": "remove_accents"
+                                                },
+                                                {
+                                                    "op": "remove_line_breaks"
+                                                },
+                                                {
+                                                    "op": "uppercase"
+                                                }
+                                            ],
+                                            "direccion_value": [
+                                                {
+                                                    "op": "trim_whitespace"
+                                                },
+                                                {
+                                                    "op": "strip_whitespace"
+                                                },
+                                                {
+                                                    "op": "remove_accents"
+                                                },
+                                                {
+                                                    "op": "remove_line_breaks"
+                                                },
+                                                {
+                                                    "op": "uppercase"
+                                                }
+                                            ],
+                                            "correo_electronico_value": [
+                                                {
+                                                    "op": "trim_whitespace"
+                                                },
+                                                {
+                                                    "op": "strip_whitespace"
+                                                },
+                                                {
+                                                    "op": "remove_accents"
+                                                },
+                                                {
+                                                    "op": "remove_line_breaks"
+                                                },
+                                                {
+                                                    "op": "regex_replace",
+                                                    "args": {
+                                                        "pattern": "\\s+",
+                                                        "replacement": ""
+                                                    }
+                                                },
+                                                {
+                                                    "op": "uppercase"
+                                                },
+                                                {
+                                                    "op": "trim_whitespace"
+                                                }
+                                            ],
+                                            "celular_value": [
+                                                {
+                                                    "op": "trim_whitespace"
+                                                },
+                                                {
+                                                    "op": "strip_whitespace"
+                                                },
+                                                {
+                                                    "op": "remove_accents"
+                                                },
+                                                {
+                                                    "op": "remove_line_breaks"
+                                                },
+                                                {
+                                                    "op": "uppercase"
+                                                },
+                                                {
+                                                    "op": "regex_replace",
+                                                    "args": {
+                                                        "pattern": "[^0-9]",
+                                                        "replacement": ""
+                                                    }
+                                                },
+                                                {
+                                                    "op": "regex_replace",
+                                                    "args": {
+                                                        "pattern": "^(?:00)?57(3\\d{9})$",
+                                                        "replacement": "\\1"
+                                                    }
+                                                },
+                                                {
+                                                    "op": "regex_replace",
+                                                    "args": {
+                                                        "pattern": "^(3\\d{9}).+$",
+                                                        "replacement": "\\1"
+                                                    }
+                                                },
+                                                {
+                                                    "op": "regex_replace",
+                                                    "args": {
+                                                        "pattern": "^.+(3\\d{9})$",
+                                                        "replacement": "\\1"
+                                                    }
+                                                },
+                                                {
+                                                    "op": "trim_whitespace"
+                                                }
+                                            ],
+                                            "ciudad_value": [
+                                                {
+                                                    "op": "trim_whitespace"
+                                                },
+                                                {
+                                                    "op": "strip_whitespace"
+                                                },
+                                                {
+                                                    "op": "uppercase"
+                                                },
+                                                {
+                                                    "op": "remove_accents"
+                                                },
+                                                {
+                                                    "op": "remove_line_breaks"
+                                                },
+                                                {
+                                                    "op": "delete_dots_commas"
+                                                },
+                                                {
+                                                    "op": "normalize_whitespace"
+                                                },
+                                                {
+                                                    "op": "delete_words",
+                                                    "args": {
+                                                        "words": [
+                                                            "DC"
+                                                        ]
+                                                    }
+                                                },
+                                                {
+                                                    "op": "remove_duplicates"
+                                                },
+                                                {
+                                                    "op": "trim_whitespace"
+                                                }
+                                            ]
+                                        },
+                                        "P2": {
+                                            "placa_value": [
+                                                {
+                                                    "op": "trim_whitespace"
+                                                },
+                                                {
+                                                    "op": "strip_whitespace"
+                                                },
+                                                {
+                                                    "op": "remove_accents"
+                                                },
+                                                {
+                                                    "op": "remove_line_breaks"
+                                                },
+                                                {
+                                                    "op": "uppercase"
+                                                }
+                                            ],
+                                            "codigo_fasecolda_value": [
+                                                {
+                                                    "op": "trim_whitespace"
+                                                },
+                                                {
+                                                    "op": "strip_whitespace"
+                                                },
+                                                {
+                                                    "op": "uppercase"
+                                                },
+                                                {
+                                                    "op": "remove_accents"
+                                                },
+                                                {
+                                                    "op": "remove_line_breaks"
+                                                },
+                                                {
+                                                    "op": "normalize_whitespace"
+                                                },
+                                                {
+                                                    "op": "split_and_select",
+                                                    "args": {
+                                                        "delimiter": " ",
+                                                        "mode": "position",
+                                                        "position": 0
+                                                    }
+                                                },
+                                                {
+                                                    "op": "keep_numbers"
+                                                },
+                                                {
+                                                    "op": "remove_leading_zeros"
+                                                },
+                                                {
+                                                    "op": "trim_whitespace"
+                                                }
+                                            ],
+                                            "servicio_value": [
+                                                {
+                                                    "op": "trim_whitespace"
+                                                },
+                                                {
+                                                    "op": "strip_whitespace"
+                                                },
+                                                {
+                                                    "op": "remove_accents"
+                                                },
+                                                {
+                                                    "op": "remove_line_breaks"
+                                                },
+                                                {
+                                                    "op": "uppercase"
+                                                },
+                                                {
+                                                    "op": "normalize_whitespace"
+                                                },
+                                                {
+                                                    "op": "split_and_select",
+                                                    "args": {
+                                                        "delimiter": " ",
+                                                        "mode": "position",
+                                                        "position": 0
+                                                    }
+                                                },
+                                                {
+                                                    "op": "trim_whitespace"
+                                                }
+                                            ],
+                                            "modelo_value": [
+                                                {
+                                                    "op": "trim_whitespace"
+                                                },
+                                                {
+                                                    "op": "strip_whitespace"
+                                                },
+                                                {
+                                                    "op": "remove_accents"
+                                                },
+                                                {
+                                                    "op": "remove_line_breaks"
+                                                },
+                                                {
+                                                    "op": "uppercase"
+                                                }
+                                            ],
+                                            "moto_value": [
+                                                {
+                                                    "op": "trim_whitespace"
+                                                },
+                                                {
+                                                    "op": "strip_whitespace"
+                                                },
+                                                {
+                                                    "op": "remove_accents"
+                                                },
+                                                {
+                                                    "op": "remove_line_breaks"
+                                                },
+                                                {
+                                                    "op": "uppercase"
+                                                }
+                                            ],
+                                            "zona_circulacion_value": [
+                                                {
+                                                    "op": "trim_whitespace"
+                                                },
+                                                {
+                                                    "op": "strip_whitespace"
+                                                },
+                                                {
+                                                    "op": "uppercase"
+                                                },
+                                                {
+                                                    "op": "remove_accents"
+                                                },
+                                                {
+                                                    "op": "remove_line_breaks"
+                                                },
+                                                {
+                                                    "op": "delete_dots_commas"
+                                                },
+                                                {
+                                                    "op": "normalize_whitespace"
+                                                },
+                                                {
+                                                    "op": "delete_words",
+                                                    "args": {
+                                                        "words": [
+                                                            "DC"
+                                                        ]
+                                                    }
+                                                },
+                                                {
+                                                    "op": "remove_duplicates"
+                                                },
+                                                {
+                                                    "op": "trim_whitespace"
+                                                }
+                                            ]
+                                        },
+                                        "P3": {
+                                            "valor_basico_vida_value": [
+                                                {
+                                                    "op": "trim_whitespace"
+                                                },
+                                                {
+                                                    "op": "strip_whitespace"
+                                                },
+                                                {
+                                                    "op": "uppercase"
+                                                },
+                                                {
+                                                    "op": "remove_accents"
+                                                },
+                                                {
+                                                    "op": "remove_line_breaks"
+                                                },
+                                                {
+                                                    "op": "regex_replace",
+                                                    "args": {
+                                                        "pattern": "\\s+",
+                                                        "replacement": ""
+                                                    }
+                                                },
+                                                {
+                                                    "op": "set_to_empty_if_contains",
+                                                    "args": {
+                                                        "values_list": [
+                                                            "NAN",
+                                                            "NONE",
+                                                            "NULL",
+                                                            "NOAPLICA",
+                                                            "N/A",
+                                                            "NOAPARECE",
+                                                            "NOSEENCUENTRA",
+                                                            "NOSEOBSERVA",
+                                                            "NOREGISTRA",
+                                                            "NODISPONIBLE",
+                                                            "NOAPLICAENELDOCUMENTO",
+                                                            "SINDATO",
+                                                            "SININFORMACION"
+                                                        ]
+                                                    }
+                                                },
+                                                {
+                                                    "op": "parse_amount"
+                                                },
+                                                {
+                                                    "op": "remove_leading_zeros"
+                                                },
+                                                {
+                                                    "op": "trim_whitespace"
+                                                }
+                                            ],
+                                            "valor_cobertura_basica_value": [
+                                                {
+                                                    "op": "trim_whitespace"
+                                                },
+                                                {
+                                                    "op": "strip_whitespace"
+                                                },
+                                                {
+                                                    "op": "uppercase"
+                                                },
+                                                {
+                                                    "op": "remove_accents"
+                                                },
+                                                {
+                                                    "op": "remove_line_breaks"
+                                                },
+                                                {
+                                                    "op": "regex_replace",
+                                                    "args": {
+                                                        "pattern": "\\s+",
+                                                        "replacement": ""
+                                                    }
+                                                },
+                                                {
+                                                    "op": "parse_amount"
+                                                },
+                                                {
+                                                    "op": "remove_leading_zeros"
+                                                },
+                                                {
+                                                    "op": "trim_whitespace"
+                                                }
+                                            ],
+                                            "valor_sustraccion_violencia_value": [
+                                                {
+                                                    "op": "trim_whitespace"
+                                                },
+                                                {
+                                                    "op": "strip_whitespace"
+                                                },
+                                                {
+                                                    "op": "uppercase"
+                                                },
+                                                {
+                                                    "op": "remove_accents"
+                                                },
+                                                {
+                                                    "op": "remove_line_breaks"
+                                                },
+                                                {
+                                                    "op": "regex_replace",
+                                                    "args": {
+                                                        "pattern": "\\s+",
+                                                        "replacement": ""
+                                                    }
+                                                },
+                                                {
+                                                    "op": "set_to_empty_if_contains",
+                                                    "args": {
+                                                        "values_list": [
+                                                            "NAN",
+                                                            "NONE",
+                                                            "NULL",
+                                                            "NOAPLICA",
+                                                            "N/A",
+                                                            "NOAPARECE",
+                                                            "NOSEENCUENTRA",
+                                                            "NOSEOBSERVA",
+                                                            "NOREGISTRA",
+                                                            "NODISPONIBLE",
+                                                            "NOAPLICAENELDOCUMENTO",
+                                                            "SINDATO",
+                                                            "SININFORMACION"
+                                                        ]
+                                                    }
+                                                },
+                                                {
+                                                    "op": "parse_amount"
+                                                },
+                                                {
+                                                    "op": "remove_leading_zeros"
+                                                },
+                                                {
+                                                    "op": "trim_whitespace"
+                                                }
+                                            ],
+                                            "valor_dano_int_eq_elec_gas_value": [
+                                                {
+                                                    "op": "trim_whitespace"
+                                                },
+                                                {
+                                                    "op": "strip_whitespace"
+                                                },
+                                                {
+                                                    "op": "uppercase"
+                                                },
+                                                {
+                                                    "op": "remove_accents"
+                                                },
+                                                {
+                                                    "op": "remove_line_breaks"
+                                                },
+                                                {
+                                                    "op": "regex_replace",
+                                                    "args": {
+                                                        "pattern": "\\s+",
+                                                        "replacement": ""
+                                                    }
+                                                },
+                                                {
+                                                    "op": "parse_amount"
+                                                },
+                                                {
+                                                    "op": "remove_leading_zeros"
+                                                },
+                                                {
+                                                    "op": "trim_whitespace"
+                                                }
+                                            ],
+                                            "valor_danos_terceros_value": [
+                                                {
+                                                    "op": "trim_whitespace"
+                                                },
+                                                {
+                                                    "op": "strip_whitespace"
+                                                },
+                                                {
+                                                    "op": "uppercase"
+                                                },
+                                                {
+                                                    "op": "remove_accents"
+                                                },
+                                                {
+                                                    "op": "remove_line_breaks"
+                                                },
+                                                {
+                                                    "op": "regex_replace",
+                                                    "args": {
+                                                        "pattern": "\\s+",
+                                                        "replacement": ""
+                                                    }
+                                                },
+                                                {
+                                                    "op": "parse_amount"
+                                                },
+                                                {
+                                                    "op": "remove_leading_zeros"
+                                                },
+                                                {
+                                                    "op": "trim_whitespace"
+                                                }
+                                            ],
+                                            "porc_ded_dano_terceros_value": [
+                                                {
+                                                    "op": "trim_whitespace"
+                                                },
+                                                {
+                                                    "op": "strip_whitespace"
+                                                },
+                                                {
+                                                    "op": "remove_accents"
+                                                },
+                                                {
+                                                    "op": "remove_line_breaks"
+                                                },
+                                                {
+                                                    "op": "uppercase"
+                                                }
+                                            ],
+                                            "perdida_total_danos_value": [
+                                                {
+                                                    "op": "trim_whitespace"
+                                                },
+                                                {
+                                                    "op": "strip_whitespace"
+                                                },
+                                                {
+                                                    "op": "uppercase"
+                                                },
+                                                {
+                                                    "op": "remove_accents"
+                                                },
+                                                {
+                                                    "op": "remove_line_breaks"
+                                                },
+                                                {
+                                                    "op": "regex_replace",
+                                                    "args": {
+                                                        "pattern": "\\s+",
+                                                        "replacement": ""
+                                                    }
+                                                },
+                                                {
+                                                    "op": "parse_amount"
+                                                },
+                                                {
+                                                    "op": "remove_leading_zeros"
+                                                },
+                                                {
+                                                    "op": "trim_whitespace"
+                                                }
+                                            ],
+                                            "porc_ded_perdida_total_danos_value": [
+                                                {
+                                                    "op": "trim_whitespace"
+                                                },
+                                                {
+                                                    "op": "strip_whitespace"
+                                                },
+                                                {
+                                                    "op": "remove_accents"
+                                                },
+                                                {
+                                                    "op": "remove_line_breaks"
+                                                },
+                                                {
+                                                    "op": "uppercase"
+                                                }
+                                            ],
+                                            "perdida_total_hurto_value": [
+                                                {
+                                                    "op": "trim_whitespace"
+                                                },
+                                                {
+                                                    "op": "strip_whitespace"
+                                                },
+                                                {
+                                                    "op": "uppercase"
+                                                },
+                                                {
+                                                    "op": "remove_accents"
+                                                },
+                                                {
+                                                    "op": "remove_line_breaks"
+                                                },
+                                                {
+                                                    "op": "regex_replace",
+                                                    "args": {
+                                                        "pattern": "\\s+",
+                                                        "replacement": ""
+                                                    }
+                                                },
+                                                {
+                                                    "op": "parse_amount"
+                                                },
+                                                {
+                                                    "op": "remove_leading_zeros"
+                                                },
+                                                {
+                                                    "op": "trim_whitespace"
+                                                }
+                                            ],
+                                            "porc_ded_perdida_total_hurto_value": [
+                                                {
+                                                    "op": "trim_whitespace"
+                                                },
+                                                {
+                                                    "op": "strip_whitespace"
+                                                },
+                                                {
+                                                    "op": "remove_accents"
+                                                },
+                                                {
+                                                    "op": "remove_line_breaks"
+                                                },
+                                                {
+                                                    "op": "uppercase"
+                                                }
+                                            ],
+                                            "val_acc_personales_conductor_value": [
+                                                {
+                                                    "op": "trim_whitespace"
+                                                },
+                                                {
+                                                    "op": "strip_whitespace"
+                                                },
+                                                {
+                                                    "op": "uppercase"
+                                                },
+                                                {
+                                                    "op": "remove_accents"
+                                                },
+                                                {
+                                                    "op": "remove_line_breaks"
+                                                },
+                                                {
+                                                    "op": "regex_replace",
+                                                    "args": {
+                                                        "pattern": "\\s+",
+                                                        "replacement": ""
+                                                    }
+                                                },
+                                                {
+                                                    "op": "parse_amount"
+                                                },
+                                                {
+                                                    "op": "remove_leading_zeros"
+                                                },
+                                                {
+                                                    "op": "trim_whitespace"
+                                                }
+                                            ],
+                                            "porc_ded_acc_pers_cond_value": [
+                                                {
+                                                    "op": "trim_whitespace"
+                                                },
+                                                {
+                                                    "op": "strip_whitespace"
+                                                },
+                                                {
+                                                    "op": "uppercase"
+                                                },
+                                                {
+                                                    "op": "remove_accents"
+                                                },
+                                                {
+                                                    "op": "remove_line_breaks"
+                                                },
+                                                {
+                                                    "op": "regex_replace",
+                                                    "args": {
+                                                        "pattern": "\\s+",
+                                                        "replacement": ""
+                                                    }
+                                                },
+                                                {
+                                                    "op": "parse_amount"
+                                                },
+                                                {
+                                                    "op": "remove_leading_zeros"
+                                                },
+                                                {
+                                                    "op": "trim_whitespace"
+                                                }
+                                            ]
+                                        },
+                                        "P4": {
+                                            "asistencia_motos_value": [
+                                                {
+                                                    "op": "trim_whitespace"
+                                                },
+                                                {
+                                                    "op": "strip_whitespace"
+                                                },
+                                                {
+                                                    "op": "remove_accents"
+                                                },
+                                                {
+                                                    "op": "remove_line_breaks"
+                                                },
+                                                {
+                                                    "op": "uppercase"
+                                                }
+                                            ],
+                                            "porcentaje_asistencia_motos_value": [
+                                                {
+                                                    "op": "trim_whitespace"
+                                                },
+                                                {
+                                                    "op": "strip_whitespace"
+                                                },
+                                                {
+                                                    "op": "remove_accents"
+                                                },
+                                                {
+                                                    "op": "remove_line_breaks"
+                                                },
+                                                {
+                                                    "op": "uppercase"
+                                                }
+                                            ],
+                                            "renta_diaria_hospitalizacion_value": [
+                                                {
+                                                    "op": "trim_whitespace"
+                                                },
+                                                {
+                                                    "op": "strip_whitespace"
+                                                },
+                                                {
+                                                    "op": "remove_accents"
+                                                },
+                                                {
+                                                    "op": "remove_line_breaks"
+                                                },
+                                                {
+                                                    "op": "uppercase"
+                                                }
+                                            ],
+                                            "porc_renta_diaria_hospitalizacion_value": [
+                                                {
+                                                    "op": "trim_whitespace"
+                                                },
+                                                {
+                                                    "op": "strip_whitespace"
+                                                },
+                                                {
+                                                    "op": "remove_accents"
+                                                },
+                                                {
+                                                    "op": "remove_line_breaks"
+                                                },
+                                                {
+                                                    "op": "uppercase"
+                                                }
+                                            ],
+                                            "prima_mensual_iva_incluido_value": [
+                                                {
+                                                    "op": "trim_whitespace"
+                                                },
+                                                {
+                                                    "op": "strip_whitespace"
+                                                },
+                                                {
+                                                    "op": "remove_accents"
+                                                },
+                                                {
+                                                    "op": "remove_line_breaks"
+                                                },
+                                                {
+                                                    "op": "regex_replace",
+                                                    "args": {
+                                                        "pattern": "[^0-9.]",
+                                                        "replacement": ""
+                                                    }
+                                                },
+                                                {
+                                                    "op": "regex_replace",
+                                                    "args": {
+                                                        "pattern": "(\\d+)\\.(\\d{2})\\d+",
+                                                        "replacement": "$1.$2"
+                                                    }
+                                                },
+                                                {
+                                                    "op": "trim_whitespace"
+                                                }
+                                            ],
+                                            "firma_value": [
+                                                {
+                                                    "op": "trim_whitespace"
+                                                },
+                                                {
+                                                    "op": "strip_whitespace"
+                                                },
+                                                {
+                                                    "op": "uppercase"
+                                                },
+                                                {
+                                                    "op": "remove_accents"
+                                                },
+                                                {
+                                                    "op": "remove_line_breaks"
+                                                },
+                                                {
+                                                    "op": "normalize_whitespace"
+                                                },
+                                                {
+                                                    "op": "regex_replace",
+                                                    "args": {
+                                                        "pattern": "\\bFIRMA\\s+DEL\\s+CLIENTE\\b",
+                                                        "replacement": ""
+                                                    }
+                                                },
+                                                {
+                                                    "op": "set_to_empty_if_contains",
+                                                    "args": {
+                                                        "values_list": [
+                                                            "SIN FIRMA",
+                                                            "NO FIRMA",
+                                                            "NO APLICA",
+                                                            "NO REGISTRA",
+                                                            "NO DISPONIBLE",
+                                                            "N/A",
+                                                            "NULL",
+                                                            "NONE",
+                                                            "NAN"
+                                                        ]
+                                                    }
+                                                },
+                                                {
+                                                    "op": "regex_replace",
+                                                    "args": {
+                                                        "pattern": "\\bFIRMA\\s+CLIENTE\\b",
+                                                        "replacement": ""
+                                                    }
+                                                },
+                                                {
+                                                    "op": "normalize_whitespace"
+                                                },
+                                                {
+                                                    "op": "regex_replace",
+                                                    "args": {
+                                                        "pattern": "^$",
+                                                        "replacement": "NO"
+                                                    }
+                                                },
+                                                {
+                                                    "op": "regex_replace",
+                                                    "args": {
+                                                        "pattern": "^(?!NO$).+",
+                                                        "replacement": "SI"
+                                                    }
+                                                },
+                                                {
+                                                    "op": "trim_whitespace"
+                                                }
+                                            ]
+                                        }
+                                    },
+                                    "response_in_s3": false
+                                }
+                            }
+                        },
+                        {
+                            "READ_INPUT_FROM": "J04",
+                            "JOB_ID": "J05",
+                            "JOB_NAME": "postprocessing",
+                            "FUNCTION_NAME": "normalize_json",
+                            "TYPE": "topic"
+                        },
+                        {
+                            "READ_INPUT_FROM": "J05",
+                            "JOB_ID": "J06",
+                            "JOB_NAME": "store_results",
+                            "TYPE": "write_results"
+                        },
+                        {
+                            "READ_INPUT_FROM": "ENV",
+                            "JOB_ID": "J07",
+                            "JOB_NAME": "datawriter",
+                            "FUNCTION_NAME": "call_api",
+                            "TYPE": "topic",
+                            "STEP_VARIABLES": {
+                                "copiarResultadoBucket": "True",
+                                "insert_results_bdtl": "True",
+                                "use_new_bdtl": "True",
+                                "parse_response_csv": "False"
+                            }
+                        }
+                    ],
+                    "THREAD_ID": "1"
+                }
+            ]
+        },
+        {
+            "LAMBDA_NAMES": "[\"Datawriter\"]",
+            "LEVEL_ID": "CALLBACK_FAIL",
+            "MS_ENDPOINT": "http://datawriter-v1-service:8080/api/v1/usecase/process",
+            "LAST_STEP": "False"
+        }
+    ],
+    "workflow_name": "nu0087001-aid-r3-pdn-nimblegravity_seguro_de_activo",
+    "workflow_variables": {
+        "canalDocumento": "CARPETA COMPARTIDA",
+        "tecnologia": "AID",
+        "tipoDocumento": "Seguro de activo",
+        "validate": false,
+        "proceso": "Realizar inteligencia digital",
+        "entidad": "Bancolombia"
+    }
+}
