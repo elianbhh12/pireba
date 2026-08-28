@@ -1,0 +1,145 @@
+import json
+import os
+import glob
+import urllib3
+import boto3
+from botocore.exceptions import ClientError, NoCredentialsError, EndpointConnectionError
+urllib3.disable_warnings()
+
+CARPETA = r'C:\Users\jeelmuno\Documents\Desarrollos\2. AID\2. Migraciones\Script Subidas'
+CRED_FILE = os.path.join(CARPETA, '0_aws_credentials.json')
+
+TABLAS = {
+    'aid': 'nu0087001-aid-r2-qa-dynamo-config-control',
+    'ta': 'nu0600001-plataforma-ia-qa-text-analyzer-table',
+    'udz': 'nu6490001-udz-qa-events-manager-table',
+}
+
+def cargar_credenciales(ruta):
+    if not os.path.exists(ruta):
+        raise FileNotFoundError(f"No existe archivo de credenciales: {ruta}")
+
+    with open(ruta, 'r', encoding='utf-8') as f:
+        creds = json.load(f)
+
+    required = ['aws_access_key_id', 'aws_secret_access_key', 'aws_session_token', 'region_name']
+    faltantes = [k for k in required if not creds.get(k)]
+    if faltantes:
+        raise ValueError(f"Faltan campos en credenciales: {faltantes}")
+
+    return creds
+
+def validar_credenciales(session):
+    try:
+        sts = session.client('sts', verify=False)
+        identity = sts.get_caller_identity()
+        print(f"Usando cuenta: {identity['Account']}")
+        print(f"Usando ARN: {identity['Arn']}")
+        return True
+    except NoCredentialsError:
+        print("❌ No hay credenciales AWS configuradas")
+    except EndpointConnectionError as e:
+        print(f"❌ No se pudo conectar a AWS STS: {e}")
+    except ClientError as e:
+        code = e.response.get('Error', {}).get('Code', 'Unknown')
+        msg = e.response.get('Error', {}).get('Message', str(e))
+        print(f"❌ Credenciales inválidas/expiradas ({code}): {msg}")
+    except Exception as e:
+        print(f"❌ Error validando credenciales: {e}")
+    return False
+
+def detectar_tipo(nombre_archivo):
+    nombre = os.path.basename(nombre_archivo).lower()
+
+    if 'aid' in nombre:
+        return 'aid'
+    if 'ta' in nombre:
+        return 'ta'
+    if 'udz' in nombre:
+        return 'udz'
+
+    return None
+
+def subir_archivo(dynamodb, ruta, tipo):
+    nombre = os.path.basename(ruta)
+    try:
+        with open(ruta, 'r', encoding='utf-8') as f:
+            item = json.load(f)
+        dynamodb.Table(TABLAS[tipo]).put_item(Item=item)
+        print(f" ✅ [{tipo.upper()}] {nombre}")
+        return True
+    except ClientError as e:
+        print(f" ❌ [{tipo.upper()}] {nombre} → {e.response['Error']['Message']}")
+    except Exception as e:
+        print(f" ❌ [{tipo.upper()}] {nombre} → {e}")
+    return False
+
+def main():
+    print("=" * 65)
+    print(" CARGA MASIVA AID / TA / UDZ → DynamoDB QA")
+    print("=" * 65)
+
+    try:
+        aws_credentials = cargar_credenciales(CRED_FILE)
+    except Exception as e:
+        print(f"\n❌ Error cargando credenciales: {e}")
+        return
+
+    session = boto3.Session(**aws_credentials)
+    if not validar_credenciales(session):
+        print("\n⛔ Proceso detenido por credenciales inválidas/expiradas.")
+        return
+
+    dynamodb = session.resource('dynamodb', verify=False)
+
+    # Prueba rápida de acceso
+    try:
+        tabla = dynamodb.Table('nu0087001-aid-r2-qa-dynamo-config-control')
+        resp = tabla.scan(Limit=1)
+        print("Scan OK:", resp.get('Count', 0), "items")
+    except ClientError as e:
+        print(f"❌ Error en scan de prueba: {e.response['Error']['Message']}")
+        return
+
+    archivos = sorted(glob.glob(os.path.join(CARPETA, '*.json')))
+    if not archivos:
+        print(f"\n⚠️ No se encontraron JSON en: {CARPETA}")
+        return
+
+    clasificados = {'aid': [], 'ta': [], 'udz': [], 'ignorados': []}
+    for ruta in archivos:
+        tipo = detectar_tipo(ruta)
+        (clasificados[tipo] if tipo else clasificados['ignorados']).append(ruta)
+
+    print(f"\n📂 {CARPETA}")
+    print(f" AID: {len(clasificados['aid'])} TA: {len(clasificados['ta'])} UDZ: {len(clasificados['udz'])}")
+
+    for nombre_tabla in TABLAS.values():
+        tabla = dynamodb.Table(nombre_tabla)
+        tabla.load()
+
+        print(f"\nTabla: {nombre_tabla}")
+        print("KeySchema:", tabla.key_schema)
+        print("Attributes:", tabla.attribute_definitions)
+
+    total = sum(len(clasificados[t]) for t in ('aid', 'ta', 'udz'))
+    if total == 0:
+        print("\n⚠️ Ningún archivo para subir")
+        return
+
+    print(f"\n Subiendo {total} archivo(s)...\n")
+
+    ok = err = 0
+    for tipo in ('aid', 'ta', 'udz'):
+        for ruta in clasificados[tipo]:
+            if subir_archivo(dynamodb, ruta, tipo):
+                ok += 1
+            else:
+                err += 1
+
+    print(f"\n{'=' * 65}")
+    print(f" RESULTADO: {ok} exitosos | {err} con errores")
+    print(f"{'=' * 65}\n")
+
+if __name__ == '__main__':
+    main()
