@@ -1,0 +1,141 @@
+import json
+import os
+import glob
+import boto3
+from boto3.dynamodb.conditions import Attr
+from botocore.exceptions import ClientError, NoCredentialsError, EndpointConnectionError
+import urllib3
+urllib3.disable_warnings()
+
+CARPETA = r'C:\Users\jeelmuno\Documents\Desarrollos\2. AID\2. Migraciones\script subidas'
+CRED_FILE = os.path.join(CARPETA, '0_aws_credentials.json')
+
+TABLAS = {
+    'aid': 'nu0087001-aid-r2-qa-dynamo-config-control',
+    'ta': 'nu0600001-plataforma-ia-qa-text-analyzer-table',
+    'udz': 'nu6490001-udz-qa-events-manager-table',
+}
+
+ATRIBUTO_VALIDACION = {
+    'aid': 's3_path',
+    'ta': 'cu_name',
+    'udz': 's3_path',
+}
+
+def cargar_credenciales(ruta):
+    if not os.path.exists(ruta):
+        raise FileNotFoundError(f"No existe archivo de credenciales: {ruta}")
+    with open(ruta, 'r', encoding='utf-8') as f:
+        creds = json.load(f)
+
+    required = ['aws_access_key_id', 'aws_secret_access_key', 'aws_session_token', 'region_name']
+    faltantes = [k for k in required if not creds.get(k)]
+    if faltantes:
+        raise ValueError(f"Faltan campos en credenciales: {faltantes}")
+    return creds
+
+def validar_credenciales(session):
+    try:
+        sts = session.client('sts', verify=False)
+        identity = sts.get_caller_identity()
+        print(f"✅ Credenciales válidas | Cuenta: {identity['Account']} | ARN: {identity['Arn']}")
+        return True
+    except NoCredentialsError:
+        print("❌ No hay credenciales AWS")
+    except EndpointConnectionError as e:
+        print(f"❌ Error de conexión a AWS: {e}")
+    except ClientError as e:
+        code = e.response.get('Error', {}).get('Code', 'Unknown')
+        msg = e.response.get('Error', {}).get('Message', str(e))
+        print(f"❌ Credenciales inválidas/expiradas ({code}): {msg}")
+    except Exception as e:
+        print(f"❌ Error validando credenciales: {e}")
+    return False
+
+def detectar_tipo(path):
+    n = os.path.basename(path).lower()
+    if n.startswith('aid_'):
+        return 'aid'
+    if n.startswith('ta_'):
+        return 'ta'
+    if n.startswith('udz_'):
+        return 'udz'
+    return None
+
+def buscar_por_atributo(table, atributo, valor):
+    encontrados = []
+    resp = table.scan(FilterExpression=Attr(atributo).eq(valor))
+    encontrados.extend(resp.get('Items', []))
+
+    while 'LastEvaluatedKey' in resp:
+        resp = table.scan(
+            FilterExpression=Attr(atributo).eq(valor),
+            ExclusiveStartKey=resp['LastEvaluatedKey']
+        )
+        encontrados.extend(resp.get('Items', []))
+    return encontrados
+
+def main():
+    try:
+        aws_credentials = cargar_credenciales(CRED_FILE)
+    except Exception as e:
+        print(f"❌ Error cargando credenciales: {e}")
+        return
+
+    session = boto3.Session(**aws_credentials)
+    if not validar_credenciales(session):
+        print("⛔ Proceso detenido.")
+        return
+
+    ddb = session.resource('dynamodb', verify=False)
+
+    ok, missing_attr, not_found, errores = 0, 0, 0, 0
+    total_revisados = 0
+
+    for ruta in sorted(glob.glob(os.path.join(CARPETA, '*.json'))):
+        tipo = detectar_tipo(ruta)
+        if not tipo:
+            continue
+
+        total_revisados += 1
+        nombre = os.path.basename(ruta)
+        atributo = ATRIBUTO_VALIDACION[tipo]
+        tabla = ddb.Table(TABLAS[tipo])
+
+        try:
+            with open(ruta, 'r', encoding='utf-8') as f:
+                esperado = json.load(f)
+
+            if atributo not in esperado or esperado[atributo] in (None, ''):
+                print(f"❌ [{tipo.upper()}] {nombre} sin atributo '{atributo}'")
+                missing_attr += 1
+                continue
+
+            valor = esperado[atributo]
+            items = buscar_por_atributo(tabla, atributo, valor)
+
+            if not items:
+                print(f"❌ [{tipo.upper()}] {nombre} no encontrado por {atributo}='{valor}'")
+                not_found += 1
+                continue
+
+            print(f"✅ [{tipo.upper()}] {nombre} encontrado(s): {len(items)}")
+            ok += 1
+
+        except ClientError as e:
+            print(f"❌ [{tipo.upper()}] {nombre} AWS error: {e.response['Error']['Message']}")
+            errores += 1
+        except Exception as e:
+            print(f"❌ [{tipo.upper()}] {nombre} error: {e}")
+            errores += 1
+
+    no_encontrados = not_found + missing_attr + errores
+
+    print("\n=== RESUMEN ===")
+    print(f"Revisados: {total_revisados}")
+    print(f"Encontrados: {ok}")
+    print(f"No encontrados: {no_encontrados}")
+    print("Estado:", "OK" if no_encontrados == 0 else "CON PENDIENTES")
+
+if __name__ == '__main__':
+    main()
