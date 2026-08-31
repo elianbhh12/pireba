@@ -1,0 +1,264 @@
+     843 │   │   """                                                                    
+────────────────────────────────────────────────────────────────────────────────────────
+FileNotFoundError: [WinError 3] El sistema no puede encontrar la ruta especificada: 
+'C:\\Users\\jeelmuno\\Documents\\Desarrollos\\2. AID\\1. 
+Deeler\\Backlog_Dealer\\Vicepresidencia Servicios de Tecnología_2026_Sprint 
+252\\7782108-PIA - [EvolucionDigital] AdministrarInfoClientes 
+P\\adjuntos\\nu0087001-aid-r3-pdn-administrar_permiso_proteccion_temporal.json'
+────────────────────────── Traceback (most recent call last) ───────────────────────────
+  C:\Users\jeelmuno\Documents\Desarrollos\2. AID\1.                                     
+  Deeler\.venv\Lib\site-packages\streamlit\runtime\scriptrunner\exec_code.py:136 in     
+  exec_func_with_error_handling                                                         
+                                                                                        
+  C:\Users\jeelmuno\Documents\Desarrollos\2. AID\1.                                     
+  Deeler\.venv\Lib\site-packages\streamlit\runtime\scriptrunner\script_runner.py:837    
+  in code_to_exec                                                                       
+                                                                                        
+  C:\Users\jeelmuno\Documents\Desarrollos\2. AID\1. Deeler\app.py:17 in <module>        
+                                                                                        
+    14 │   initial_sidebar_state="collapsed"                                            
+    15 )                                                                                
+    16                                                                                  
+  ❱ 17 run_app()                                                                        
+    18                                                                                  
+                                                                                        
+  C:\Users\jeelmuno\Documents\Desarrollos\2. AID\1. Deeler\ui\__init__.py:30 in         
+  run_app                                                                               
+                                                                                        
+    27 │   backlog.render_tabla_resumen(resultados)                                     
+    28 │                                                                                
+    29 │   hu_detail.render_hu_detail(resultados, sprint_activo)                        
+  ❱ 30 │   aws_console.render_aws_console(resultados)                                   
+    31                                                                                  
+                                                                                        
+  C:\Users\jeelmuno\Documents\Desarrollos\2. AID\1. Deeler\ui\aws_console.py:262 in     
+  render_aws_console                                                                    
+                                                                                        
+    259 │   │   │   │   ayuda = None                                                    
+    260 │   │   │                                                                       
+    261 │   │   │   if archivo:                                                         
+  ❱ 262 │   │   │   │   _render_contenido(Path(archivo), tipo)                          
+    263 │   │   │                                                                       
+    264 │   │   │   if st.button(                                                       
+    265 │   │   │   │   f"Subir {tipo.upper()}", key=f"aws_console_subir_{tipo}", widt  
+                                                                                        
+  C:\Users\jeelmuno\Documents\Desarrollos\2. AID\1. Deeler\ui\aws_console.py:99 in      
+  _render_contenido                                                                     
+                                                                                        
+     96                                                                                 
+     97                                                                                 
+     98 def _render_contenido(archivo: Path, tipo: str):                                
+  ❱  99 │   tam_kb = archivo.stat().st_size / 1024                                      
+    100 │   try:                                                                        
+    101 │   │   texto = archivo.read_text(encoding="utf-8")                             
+    102 │   except Exception as e:                                                      
+                                                                                        
+  C:\Program Files\Python312\Lib\pathlib.py:840 in stat                                 
+                                                                                        
+     837 │   │   Return the result of the stat() system call on this path, like         
+     838 │   │   os.stat() does.                                                        
+     839 │   │   """                                                                    
+  ❱  840 │   │   return os.stat(self, follow_symlinks=follow_symlinks)                  
+     841 │                                                                              
+     842 │   def lstat(self):                                                           
+     843 │   │   """                                                                    
+────────────────────────────────────────────────────────────────────────────────────────
+FileNotFoundError: [WinError 3] El sistema no puede encontrar la ruta especificada: 
+'C:\\Users\\jeelmuno\\Documents\\Desarrollos\\2. AID\\1. 
+Deeler\\Backlog_Dealer\\Vicepresidencia Servicios de Tecnología_2026_Sprint 
+252\\7782108-PIA - [EvolucionDigital] AdministrarInfoClientes 
+P\\adjuntos\\nu0087001-aid-r3-pdn-administrar_permiso_proteccion_temporal.json'
+────────────────────────── Traceback (most recent call last) ───────────────────────────
+  C:\Users\jeelmuno\Documents\Desarrollos\2. AID\1.                                     
+  Deeler\.venv\Lib\site-packages\streamlit\runtime\scriptrunner\exec_code.py:136 in     
+  exec_func_with_error_handling                                                         
+                                                                                        
+  C:\Users\jeelmuno\Documents\Desarrollos\2. AID\1.                                     
+  Deeler\.venv\Lib\site-packages\streamlit\runtime\scriptrunner\script_runner.py:837    
+  in code_to_exec                                                                       
+                                                                                        
+  C:\Users\jeelmuno\Documents\Desarrollos\2. AID\1. Deeler\app.py:17 in <module>        
+                                                                                        
+    14 │   initial_sidebar_state="collapsed"                                            
+    15 )                                                                                
+    16                                                                                  
+  ❱ 17 run_app()                                                                        
+    18                                                                                  
+                                                                                        
+  C:\Users\jeelmuno\Documents\Desarrollos\2. AID\1. Deeler\ui\__init__.py:30 in         
+  run_app                                                                               
+                                                                                        
+    27 │   backlog.render_tabla_resumen(resultados)                                     
+    28 │                                                                                
+    29 │   hu_detail.render_hu_detail(resultados, sprint_activo)                        
+  ❱ 30 │   aws_console.render_aws_console(resultados)                                   
+    31                                                                                  
+                                                                                        
+  C:\Users\jeelmuno\Documents\Desarrollos\2. AID\1. Deeler\ui\aws_console.py:262 in     
+  render_aws_console                                                                    
+                                                                                        
+    259 │   │   │   │   ayuda = None                                                    
+    260 │   │   │                                                                       
+    261 │   │   │   if archivo:                                                         
+  ❱ 262 │   │   │   │   _render_contenido(Path(archivo), tipo)                          
+    263 │   │   │                                                                       
+    264 │   │   │   if st.button(                                                       
+    265 │   │   │   │   f"Subir {tipo.upper()}", key=f"aws_console_subir_{tipo}", widt  
+                                                                                        
+  C:\Users\jeelmuno\Documents\Desarrollos\2. AID\1. Deeler\ui\aws_console.py:99 in      
+  _render_contenido                                                                     
+                                                                                        
+     96                                                                                 
+     97                                                                                 
+     98 def _render_contenido(archivo: Path, tipo: str):                                
+  ❱  99 │   tam_kb = archivo.stat().st_size / 1024                                      
+    100 │   try:                                                                        
+    101 │   │   texto = archivo.read_text(encoding="utf-8")                             
+    102 │   except Exception as e:                                                      
+                                                                                        
+  C:\Program Files\Python312\Lib\pathlib.py:840 in stat                                 
+                                                                                        
+     837 │   │   Return the result of the stat() system call on this path, like         
+     838 │   │   os.stat() does.                                                        
+     839 │   │   """                                                                    
+  ❱  840 │   │   return os.stat(self, follow_symlinks=follow_symlinks)                  
+     841 │                                                                              
+     842 │   def lstat(self):                                                           
+     843 │   │   """                                                                    
+────────────────────────────────────────────────────────────────────────────────────────
+FileNotFoundError: [WinError 3] El sistema no puede encontrar la ruta especificada: 
+'C:\\Users\\jeelmuno\\Documents\\Desarrollos\\2. AID\\1. 
+Deeler\\Backlog_Dealer\\Vicepresidencia Servicios de Tecnología_2026_Sprint 
+252\\7782108-PIA - [EvolucionDigital] AdministrarInfoClientes P\\adjuntos\\config.json'
+────────────────────────── Traceback (most recent call last) ───────────────────────────
+  C:\Users\jeelmuno\Documents\Desarrollos\2. AID\1.                                     
+  Deeler\.venv\Lib\site-packages\streamlit\runtime\scriptrunner\exec_code.py:136 in     
+  exec_func_with_error_handling                                                         
+                                                                                        
+  C:\Users\jeelmuno\Documents\Desarrollos\2. AID\1.                                     
+  Deeler\.venv\Lib\site-packages\streamlit\runtime\scriptrunner\script_runner.py:837    
+  in code_to_exec                                                                       
+                                                                                        
+  C:\Users\jeelmuno\Documents\Desarrollos\2. AID\1. Deeler\app.py:17 in <module>        
+                                                                                        
+    14 │   initial_sidebar_state="collapsed"                                            
+    15 )                                                                                
+    16                                                                                  
+  ❱ 17 run_app()                                                                        
+    18                                                                                  
+                                                                                        
+  C:\Users\jeelmuno\Documents\Desarrollos\2. AID\1. Deeler\ui\__init__.py:30 in         
+  run_app                                                                               
+                                                                                        
+    27 │   backlog.render_tabla_resumen(resultados)                                     
+    28 │                                                                                
+    29 │   hu_detail.render_hu_detail(resultados, sprint_activo)                        
+  ❱ 30 │   aws_console.render_aws_console(resultados)                                   
+    31                                                                                  
+                                                                                        
+  C:\Users\jeelmuno\Documents\Desarrollos\2. AID\1. Deeler\ui\aws_console.py:262 in     
+  render_aws_console                                                                    
+                                                                                        
+    259 │   │   │   │   ayuda = None                                                    
+    260 │   │   │                                                                       
+    261 │   │   │   if archivo:                                                         
+  ❱ 262 │   │   │   │   _render_contenido(Path(archivo), tipo)                          
+    263 │   │   │                                                                       
+    264 │   │   │   if st.button(                                                       
+    265 │   │   │   │   f"Subir {tipo.upper()}", key=f"aws_console_subir_{tipo}", widt  
+                                                                                        
+  C:\Users\jeelmuno\Documents\Desarrollos\2. AID\1. Deeler\ui\aws_console.py:99 in      
+  _render_contenido                                                                     
+                                                                                        
+     96                                                                                 
+     97                                                                                 
+     98 def _render_contenido(archivo: Path, tipo: str):                                
+  ❱  99 │   tam_kb = archivo.stat().st_size / 1024                                      
+    100 │   try:                                                                        
+    101 │   │   texto = archivo.read_text(encoding="utf-8")                             
+    102 │   except Exception as e:                                                      
+                                                                                        
+  C:\Program Files\Python312\Lib\pathlib.py:840 in stat                                 
+                                                                                        
+     837 │   │   Return the result of the stat() system call on this path, like         
+     838 │   │   os.stat() does.                                                        
+     839 │   │   """                                                                    
+  ❱  840 │   │   return os.stat(self, follow_symlinks=follow_symlinks)                  
+     841 │                                                                              
+     842 │   def lstat(self):                                                           
+     843 │   │   """                                                                    
+────────────────────────────────────────────────────────────────────────────────────────
+FileNotFoundError: [WinError 3] El sistema no puede encontrar la ruta especificada: 
+'C:\\Users\\jeelmuno\\Documents\\Desarrollos\\2. AID\\1. 
+Deeler\\Backlog_Dealer\\Vicepresidencia Servicios de Tecnología_2026_Sprint 
+252\\7782108-PIA - [EvolucionDigital] AdministrarInfoClientes P\\adjuntos\\config.json'
+────────────────────────── Traceback (most recent call last) ───────────────────────────
+  C:\Users\jeelmuno\Documents\Desarrollos\2. AID\1.                                     
+  Deeler\.venv\Lib\site-packages\streamlit\runtime\scriptrunner\exec_code.py:136 in     
+  exec_func_with_error_handling                                                         
+                                                                                        
+  C:\Users\jeelmuno\Documents\Desarrollos\2. AID\1.                                     
+  Deeler\.venv\Lib\site-packages\streamlit\runtime\scriptrunner\script_runner.py:837    
+  in code_to_exec                                                                       
+                                                                                        
+  C:\Users\jeelmuno\Documents\Desarrollos\2. AID\1. Deeler\app.py:17 in <module>        
+                                                                                        
+    14 │   initial_sidebar_state="collapsed"                                            
+    15 )                                                                                
+    16                                                                                  
+  ❱ 17 run_app()                                                                        
+    18                                                                                  
+                                                                                        
+  C:\Users\jeelmuno\Documents\Desarrollos\2. AID\1. Deeler\ui\__init__.py:30 in         
+  run_app                                                                               
+                                                                                        
+    27 │   backlog.render_tabla_resumen(resultados)                                     
+    28 │                                                                                
+    29 │   hu_detail.render_hu_detail(resultados, sprint_activo)                        
+  ❱ 30 │   aws_console.render_aws_console(resultados)                                   
+    31                                                                                  
+                                                                                        
+  C:\Users\jeelmuno\Documents\Desarrollos\2. AID\1. Deeler\ui\aws_console.py:262 in     
+  render_aws_console                                                                    
+                                                                                        
+    259 │   │   │   │   ayuda = None                                                    
+    260 │   │   │                                                                       
+    261 │   │   │   if archivo:                                                         
+  ❱ 262 │   │   │   │   _render_contenido(Path(archivo), tipo)                          
+    263 │   │   │                                                                       
+    264 │   │   │   if st.button(                                                       
+    265 │   │   │   │   f"Subir {tipo.upper()}", key=f"aws_console_subir_{tipo}", widt  
+                                                                                        
+  C:\Users\jeelmuno\Documents\Desarrollos\2. AID\1. Deeler\ui\aws_console.py:99 in      
+  _render_contenido                                                                     
+                                                                                        
+     96                                                                                 
+     97                                                                                 
+     98 def _render_contenido(archivo: Path, tipo: str):                                
+  ❱  99 │   tam_kb = archivo.stat().st_size / 1024                                      
+    100 │   try:                                                                        
+    101 │   │   texto = archivo.read_text(encoding="utf-8")                             
+    102 │   except Exception as e:                                                      
+                                                                                        
+  C:\Program Files\Python312\Lib\pathlib.py:840 in stat                                 
+                                                                                        
+     837 │   │   Return the result of the stat() system call on this path, like         
+     838 │   │   os.stat() does.                                                        
+     839 │   │   """                                                                    
+  ❱  840 │   │   return os.stat(self, follow_symlinks=follow_symlinks)                  
+     841 │                                                                              
+     842 │   def lstat(self):                                                           
+     843 │   │   """                                                                    
+────────────────────────────────────────────────────────────────────────────────────────
+FileNotFoundError: [WinError 3] El sistema no puede encontrar la ruta especificada: 
+'C:\\Users\\jeelmuno\\Documents\\Desarrollos\\2. AID\\1. 
+Deeler\\Backlog_Dealer\\Vicepresidencia Servicios de Tecnología_2026_Sprint 
+252\\7782108-PIA - [EvolucionDigital] AdministrarInfoClientes P\\adjuntos\\config.json'
+Exception in callback _ProactorBasePipeTransport._call_connection_lost(None)
+handle: <Handle _ProactorBasePipeTransport._call_connection_lost(None)>
+Traceback (most recent call last):
+  File "C:\Program Files\Python312\Lib\asyncio\events.py", line 88, in _run
+    self._context.run(self._callback, *self._args)
+  File "C:\Program Files\Python312\Lib\asyncio\proactor_events.py", line 165, in _call_connection_lost
+    self._sock.shutdown(socket.SHUT_RDWR)
+ConnectionResetError: [WinError 10054] Se ha forzado la interrupción de una conexión existente por el host remoto
